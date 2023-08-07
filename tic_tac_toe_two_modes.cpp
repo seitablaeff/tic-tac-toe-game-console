@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <random>
 
 using namespace std;
 
@@ -46,7 +47,7 @@ public:
         cout << " " << endl;
     }
 
-    // метод установки символа в ячейку
+    // метод установки символа в ячейку для Игрока
     void setPlayerSymbol(int r, int c, string s) {
         // проверка, не выходит ли за границы введённое значение
         if ((r < 3 && r >= 0) && (c < 3 && c >= 0)) {
@@ -60,6 +61,7 @@ public:
         }
     }
 
+    // метод установки символа в ячейку для Компьютера
     void setCompSymbol(int r, int c, string s) {
         // проверка, не выходит ли за границы введённое значение
         if ((r < 3 && r >= 0) && (c < 3 && c >= 0)) {
@@ -157,6 +159,7 @@ public:
         }
     }
 
+    // метод хода Компьтера
     void CompMove(string val) {
         // случайное значение        
         int s;
@@ -165,15 +168,15 @@ public:
         // значение игрока
         string oppVal;
         if (val == "X") {
-            oppVal = "O";
+            oppVal = "0";
         }
-        else {
+        if (val == "0") {
             oppVal = "X";
         }
 
         // Первое правило: если можешь немедленно выиграть - выигрывай
         // Второе правило: если игрок не может выиграть немедленно, но если он мог бы немедленно выиграть,
-        // сделав ход в какую-то клетку, компьютер сам делает ход в эту клетку предотвращая немедленный выигрыш
+        // сделав ход в какую-то клетку, компьютер сам делает ход в эту клетку, предотвращая немедленный выигрыш
 
         //........................ 1 правило
         // ГОРИЗОНТАЛИ
@@ -236,18 +239,22 @@ public:
         // проверка почти заполненных диагоналей
         if (pole[0][0] == val && pole[1][1] == val && pole[2][2] == "-" && count == 0) {
             pole[2][2] = val;
+            count++;
             // cout << "7" << endl;
         }
         else if (pole[0][2] == val && pole[1][1] == val && pole[2][0] == "-" && count == 0) {
             pole[2][0] = val;
+            count++;
             // cout << "8" << endl;
         }
         else if (pole[2][0] == val && pole[1][1] == val && pole[0][2] == "-" && count == 0) {
             pole[0][2] = val;
+            count++;
             // cout << "9" << endl;
         }
         else if (pole[2][2] == val && pole[1][1] == val && pole[0][0] == "-" && count == 0) {
             pole[0][0] = val;
+            count++;
             // cout << "10" << endl;
         }
         
@@ -337,7 +344,7 @@ public:
             count++;
             // cout << "21" << endl;
         }
-        else if (count == 0){
+        else if ((count == 0) && (pole[1][1] != "-")) {
             s = rand() % 4;
             if ((s == 0 && pole[0][0] == "-") || (s == 1 && pole[0][0] == "-") || (s == 2 && pole[0][0] == "-") || (s == 3 && pole[0][0] == "-")) {
                 pole[0][0] = val;
@@ -361,12 +368,13 @@ public:
             }
         }
 
-        // если не подходит ни один случай, нужно вставлять в любую пустую ячейку
+        // если не подходит ни один случай, нужно вставлять в первую попавшуюся пустую ячейку
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (pole[i][j] == "-" && count == 0) {
                     pole[i][j] = val;
                     count++;
+                    // cout << "26" << endl;
                 }
             }
         }
@@ -378,9 +386,9 @@ class Player {
         string value, name;
 
     public:
-        // конструктор - позиция на элементе [0],[0]
+        // конструктор - позиция на элементе [1],[1] - самый оптимальный первый ход
         Player() {
-            row = column = 0;
+            row = column = 1;
             value = "";
             name = "Игрок";
         }
@@ -403,21 +411,13 @@ class Player {
         // возвращает имя
         string getName() { return name; }
 
-        void setRow(int r) {
-            row = r;
-        }
+        void setRow(int r) { row = r; }
 
-        void setColumn(int c) {
-            column = c;
-        }
+        void setColumn(int c) { column = c; }
         
-        void setValue(string v) {
-            value = v;
-        }
+        void setValue(string v) { value = v; }
 
-        void setName(string n) {
-            name = n;
-        }
+        void setName(string n) { this->name = n; }
 };
 
 
@@ -427,7 +427,7 @@ class Computer : public Player {
 
     public:
         Computer() {
-            row = column = 0;
+            row = column = 1;
             value = "";
             name = "Computer";
         }
@@ -451,10 +451,10 @@ class Game {
             cout << "   2 | - | - | - | " << endl;
             cout << " " << endl;
             cout << "То есть, чтобы обратиться к определённой ячейке, вводите следующие координаты" << endl;
-            cout << "     |  0   |  1  |  2  | " << endl;
-            cout << "   0 | 0 0  | 0 1 | 0 2 | " << endl;
-            cout << "   1 | 1 0  | 1 1 | 1 2 | " << endl;
-            cout << "   2 | 2 0  | 2 1 | 2 2 | " << endl;
+            cout << "     |  0  |  1  |  2  | " << endl;
+            cout << "   0 | 0 0 | 0 1 | 0 2 | " << endl;
+            cout << "   1 | 1 0 | 1 1 | 1 2 | " << endl;
+            cout << "   2 | 2 0 | 2 1 | 2 2 | " << endl;
             cout << " " << endl;
         }
 
@@ -466,16 +466,25 @@ class Game {
             Player first;
             Player second;
 
+            random_device rd; // Инициализация генератора случайных чисел
+            mt19937 generator(rd()); // Создание генератора с использованием random_device
+            uniform_int_distribution<int> distribution(0, 1); // Диапазон случайных чисел
+
+            int randomizer = distribution(generator); // Генерация случайного числа
+
+            cout << "ИГРОК vs ИГРОК" << endl;
+            p.print();
+
             string n1, n2;
-            cout << "Игрок №1, введите имя: ";
+            cout << "Игрок #1, введите имя: ";
             cin >> n1;
 
-            cout << "Игрок №2, введите имя: ";
+            cout << "Игрок #2, введите имя: ";
             cin >> n2;
             first.setName(n1);
             second.setName(n2);
 
-            int whoFirst, randomizer;
+            int whoFirst;
             int whoSecond = 0;
             cout << "Назначение первого игрока проходит случайным образом - игроки выбирают 1 и 0: чьё число совпадёт со случайно выбранном, ходит первым." << endl;
             cout << "Игрок " << n1 << ", введите число (сперва договорившись с игроком " << n2 << "):" << endl;
@@ -483,20 +492,16 @@ class Game {
             if (whoFirst == 0) {
                 whoSecond = 1;
             }
-            else if (whoFirst == 1) {
+            if (whoFirst == 1) {
                 whoSecond = 0;
             }
-            else {
-                cout << "Вы ввели что-то не то... НАЧИНАЙТЕ ВСЁ СНАЧАЛА!!!";
-            }
 
-            randomizer = rand() % 2;
-
-            // если совпадает со случайно выбранным
+            // Первый Игрок ходит первым
             if (whoFirst == randomizer) {
                 cout << "Если игрок " << n1 << " выбрал " << whoFirst << ", значит игрок " << n2 << " выбрал " << whoSecond << "." << endl;
                 cout << "Игрок " << n1 << " ходит первым." << endl;
                 p.print();
+
                 // переменная, определяющая, есть ли победа или ничья
                 bool status = false;
 
@@ -506,10 +511,10 @@ class Game {
                     first.setVal();
                     // вводим значение на поле
                     p.setPlayerSymbol(first.getRow(), first.getColumn(), "X");
-                    p.print();
 
                     status = p.checkedEnd();
                     p.checked_Win_or_Draw(n1);
+                    p.print();
                     if (status) {
                         break;
                     }
@@ -517,27 +522,32 @@ class Game {
                     cout << "--------------------- ХОД ИГРОКА " << second.getName() << " ---------------------" << endl;
                     second.setVal();
                     p.setPlayerSymbol(second.getRow(), second.getColumn(), "0");
-                    p.print();
 
                     status = p.checkedEnd();
                     p.checked_Win_or_Draw(n2);
+                    p.print();
                 }
 
                 if (status) {
                     cout << "Игра окончена!" << endl;
                 }
             }
-            else if (whoSecond == randomizer) {
+            
+            // Второй Игрок ходит первым
+            if (whoSecond == randomizer) {
                 cout << "Если игрок " << n1 << " выбрал " << whoFirst << ", значит игрок " << n2 << " выбрал " << whoSecond << "." << endl;
                 cout << "Игрок " << n2 << " ходит первым." << endl;
+                p.print();
+
                 // переменная, определяющая, есть ли победа или ничья
                 bool status = false;
 
                 while (!status) {
                     cout << "--------------------- ХОД ИГРОКА " << second.getName() << " ---------------------" << endl;
+                    p.print();
+                    
                     second.setVal();
                     p.setPlayerSymbol(second.getRow(), second.getColumn(), "0");
-                    p.print();
 
                     status = p.checkedEnd();
                     p.checked_Win_or_Draw(n2);
@@ -546,6 +556,8 @@ class Game {
                     }
 
                     cout << "--------------------- ХОД ИГРОКА " << first.getName() << " ---------------------" << endl;
+                    p.print();
+
                     // вводим значение для игрока
                     first.setVal();
                     // вводим значение на поле
@@ -569,66 +581,71 @@ class Game {
             Player first;
             Computer comp;
 
+            random_device rd; // Инициализация генератора случайных чисел
+            mt19937 generator(rd()); // Создание генератора с использованием random_device
+            uniform_int_distribution<int> distribution(0, 1); // Диапазон случайных чисел
+
+            int random = distribution(generator); // Генерация случайного числа
+
             // row, column
             int r, c;
-            int random;
 
-            p.print();
+            cout << "ИГРОК vs КОМПЬЮТЕР" << endl;
 
             string n;
             cout << "Игрок, введите имя: ";
             cin >> n;
+            first.setName(n);
 
-            // выбор игрока, идуущего первым
+            // выбор игрока, идущего первым
             int whoIsFirst;
-            cout << "Каким способом вы хотите выбрать того, кто будет играть за КРЕСТИКОВ: случайно (1) или самостоятельно (2) ?" << endl;
+            cout << "Каким способом вы хотите выбрать того, кто будет играть за КРЕСТИКОВ: случайно (1) или самостоятельно (2)?" << endl;
             cin >> whoIsFirst;
 
+            // случайный выбор
             if (whoIsFirst == 1) {
-                random = rand() % 2;
-                // компьютер первый - крестик
+                // компьютер - крестик
                 if (random == 0) {
                     comp.setValue("X");
                     first.setValue("0");
                 }
-                // компьютер второй - нолик
-                else {
+                // компьютер - нолик
+                if (random == 1) {
                     comp.setValue("0");
                     first.setValue("X");
                 }
             }
-            else if (whoIsFirst == 2) {
+
+            // самостоятельный выбор
+            if (whoIsFirst == 2) {
                 int whoToBe;
                 cout << "Вы хотите быть крестиком (1) или ноликом (2): " << endl;
                 cin >> whoToBe;
+                // игрок - крестики
                 if (whoToBe == 1) {
                     comp.setValue("0");
                     first.setValue("X");
                 }
-                else if (whoToBe == 2) {
+                // игрок - нолики
+                if (whoToBe == 2) {
                     comp.setValue("X");
                     first.setValue("0");
                 }
-                else {
-                    cout << "Капец, вы ввели что-то не то... Начинайте сначала всё :/" << endl;
-                }
-            }
-            else {
-                cout << "Капец, вы ввели что-то не то... Начинайте сначала всё :/" << endl;
-            }
 
+            }
 
             // переменная, определяющая, есть ли победа или ничья
             bool status = false;
 
-            // если совпало - первый ход  rand() % 2 == whoIsFirst
-            if (comp.getValue() == "X") {
+            // Компьютер ходит вторым
+            if (comp.getValue() == "0") {
                 cout << "Игрок " << n << " ходит первым" << endl;
                 // переменная, определяющая, есть ли победа или ничья
                 // bool status = false;
+                p.print(); 
 
                 while (!status) {
-                    cout << "--------------------- ХОД ИГРОКА " << n << " ---------------------" << endl;
+                    cout << "--------------------- ХОД ИГРОКА " << first.getName() << " ---------------------" << endl;
                     // вводим значение для игрока
                     cout << n << ", введите координаты (через пробел): ";
                     cin >> r;
@@ -642,7 +659,7 @@ class Game {
                     p.print();
 
                     status = p.checkedEnd();
-                    p.checked_Win_or_Draw(n);
+                    p.checked_Win_or_Draw(first.getName());
                     if (status) {
                         break;
                     }
@@ -660,12 +677,15 @@ class Game {
                     cout << "Игра окончена!" << endl;
                 }
             }
-            // если не совпало - первый ход Компьютера
-            else {
+
+            // Компьютер ходит первым
+            if (comp.getValue() == "X") {
                 cout << "Computer ходит первым" << endl;
+                p.print();
 
                 while (!status) {
                     cout << "--------------------- ХОД КОМПЬЮТЕРА ---------------------" << endl;
+                    
                     p.CompMove(comp.getValue());
                     p.setCompSymbol(comp.getRow(), comp.getColumn(), comp.getValue());
                     p.print();
@@ -677,7 +697,7 @@ class Game {
                         break;
                     }
 
-                    cout << "--------------------- ХОД ИГРОКА ---------------------" << endl;
+                    cout << "--------------------- ХОД ИГРОКА " << first.getName() << " ---------------------" << endl;
                     // вводим значение для игрока
                     cout << n << ", введите координаты (через пробел): ";
                     cin >> r;
@@ -691,7 +711,7 @@ class Game {
                     p.print();
 
                     status = p.checkedEnd();
-                    p.checked_Win_or_Draw(n);
+                    p.checked_Win_or_Draw(first.getName());
                 }
 
                 if (status) {
@@ -700,7 +720,7 @@ class Game {
             }
 
         }
-    };
+    }; 
 
     int main() {
         setlocale(LC_ALL, "Russian");
@@ -718,11 +738,9 @@ class Game {
         cin >> choice;
 
         if (choice == 1) {
-            cout << "ИГРОК vs ИГРОК" << endl;
             g.twoPlayerGame();
         }
         else if (choice == 2) {
-            cout << "ИГРОК vs КОМПЬЮТЕР" << endl;
             g.onePlayerGame();
         }
 
